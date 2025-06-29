@@ -1,0 +1,40 @@
+2025-06-27 00:58:00 - Failed login attempt - ::1 - Email: zack@gmail.com - Invalid password
+2025-06-27 00:58:19 - Failed login attempt - ::1 - Email: zack1@gmail.com - User not found
+2025-06-27 00:58:54 - Successful registration - ::1 - Email: zack2@gmail.com
+2025-06-27 00:59:02 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 00:59:38 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-06-27 14:46:47 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 14:49:39 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 15:02:34 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 15:08:10 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-06-27 15:09:56 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 15:19:22 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 15:32:05 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:07:21 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:11:07 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:13:45 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:15:20 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:17:40 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:23:15 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:26:32 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:31:04 - Successful registration - ::1 - Email: zack23@gmail.com
+2025-06-27 18:31:25 - Successful login - ::1 - User ID: 4, Email: zack23@gmail.com
+2025-06-27 18:37:54 - Successful login - ::1 - User ID: 4, Email: zack23@gmail.com
+2025-06-27 18:38:35 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:46:19 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:47:26 - Successful login - ::1 - User ID: 3, Email: zack2@gmail.com
+2025-06-27 18:48:00 - Successful login - ::1 - User ID: 4, Email: zack23@gmail.com
+2025-06-27 19:06:18 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-06-29 20:26:05 - Successful registration - ::1 - Email: maajean@gmail.com
+2025-06-29 20:26:18 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
+2025-06-29 21:12:05 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-06-29 22:42:23 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
+2025-06-29 23:11:09 - Failed login attempt - ::1 - Email: maajean@gmail.com - Invalid password
+2025-06-29 23:11:24 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
+2025-06-29 23:53:13 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-06-30 00:23:45 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
+2025-06-30 00:24:22 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
+2025-06-30 00:34:45 - Failed login attempt - ::1 - Email: maajean@gmail.com - Invalid password
+2025-06-30 00:34:54 - Failed login attempt - ::1 - Email: maajean@gmail.com - Invalid password
+2025-06-30 00:35:05 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
+2025-06-30 01:03:11 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
