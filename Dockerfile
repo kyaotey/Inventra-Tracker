@@ -1,15 +1,15 @@
 FROM php:8.1-apache
 
-# Fix Apache "ServerName" warning
+# Fix Apache warning
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Enable mysqli extension (important for DB)
+# Enable MySQL extension
 RUN docker-php-ext-install mysqli
 
-# Copy project files into Apache directory
+# Copy all files
 COPY . /var/www/html/
 
-# Set proper permissions
+# Fix ownership (permissions)
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
