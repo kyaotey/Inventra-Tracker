@@ -345,8 +345,8 @@ if (isset($_SESSION['user_id'])) {
                                     
                                     <?php if ($report['status'] === 'returned'): ?>
                                         <div class="timeline-item">
-                                            <div class="fw-bold text-success"><?= $category_text ?> Returned</div>
-                                            <div class="text-muted">Successfully reunited with owner</div>
+                                            <div class="fw-bold text-success"><?php if ($report['category'] === 'person') { echo 'Person Reunited'; } else { echo $category_text . ' Returned'; } ?></div>
+                                            <div class="text-muted">Reunited with their family, friends, or caregivers</div>
                                         </div>
                                     <?php else: ?>
                                         <div class="timeline-item">
