@@ -1,4 +1,10 @@
-# Missing Items, Persons & Pets Tracker
+# Inventra
+
+**Name Meaning:**
+
+"Inven" comes from the Latin root *invenire*, meaning "to find" or "to discover."
+
+"tra" is a soft, system-oriented suffix, evoking terms like "mantra," "spectra," and "entra" — suggesting a process, flow, or platform.
 
 A secure, modern web application for tracking lost and found items, missing persons, and pets with user authentication and admin management.
 

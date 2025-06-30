@@ -1,13 +1,22 @@
 <?php
-// Database configuration with enhanced security
+// Database configuration for production hosting
+// Update these values with your hosting provider's database credentials
+
+// For InfinityFree, these are typically provided in your hosting control panel
+$host = 'localhost'; // Usually 'localhost' for most free hosts
+$user = 'your_db_username'; // Replace with your database username
+$pass = 'your_db_password'; // Replace with your database password
+$dbname = 'your_db_name'; // Replace with your database name
+
+// For development, you can use these local settings:
 $host = 'localhost';
 $user = 'root';
 $pass = '';
 $dbname = 'missing_items_db';
 
-// Set error reporting for development (remove in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1); // Show errors for development
+// Set error reporting for production (hide errors from users)
+error_reporting(0);
+ini_set('display_errors', 0); // Hide errors in production
 
 try {
     $conn = new mysqli($host, $user, $pass, $dbname);
