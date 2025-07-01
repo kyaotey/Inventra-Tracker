@@ -1,7 +1,7 @@
 <?php 
-require 'includes/security.php';
+require __DIR__ . '/includes/security.php';
 session_start();
-require 'includes/db.php'; 
+require __DIR__ . '/includes/db.php'; 
 // Show welcome popup if just logged in
 $show_welcome = false;
 if (isset($_SESSION['show_welcome']) && $_SESSION['show_welcome'] && isset($_SESSION['name'])) {
