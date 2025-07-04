@@ -50,3 +50,5 @@
 2025-07-04 19:51:47 - Successful login - ::1 - User ID: 1, Email: admin@example.com
 2025-07-04 19:53:12 - Failed login attempt - ::1 - Email: zack23@gmail.com - Invalid password
 2025-07-04 19:54:08 - Failed login attempt - ::1 - Email: zack23@gmail.com - Invalid password
+2025-07-04 19:57:10 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 19:58:33 - Successful login - ::1 - User ID: 4, Email: zack23@gmail.com

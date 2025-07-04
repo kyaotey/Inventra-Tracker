@@ -613,6 +613,15 @@ if (isset($_GET['id'])) {
                                     <img src="<?= htmlspecialchars($report['photo']) ?>" alt="<?= $category_text ?> Photo" class="img-fluid rounded-4 shadow-sm" style="max-height:320px;object-fit:cover;">
                                 </div>
                             <?php endif; ?>
+                            <!-- Map Placeholder Section -->
+                            <div class="mb-4">
+                                <div class="info-card d-flex flex-column align-items-center justify-content-center" style="min-height:220px; background: #f8f9fa; border: 1px dashed #b0b0b0;">
+                                    <div class="info-label mb-2" style="font-size:1.15rem;"><i class="fas fa-map-marked-alt me-2"></i>Map <span class="badge bg-secondary">Coming Soon</span></div>
+                                    <div id="map" style="width:100%;max-width:500px;height:180px;background:#e9ecef;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#888;font-size:1.1rem;">
+                                        Map will appear here
+                                    </div>
+                                </div>
+                            </div>
                             <div class="info-card mb-3 clickable-info" data-bs-toggle="modal" data-bs-target="#descModal" style="cursor:pointer;">
                                 <div class="info-label"><i class="fas fa-info-circle me-2"></i><?= $category_text ?> Description</div>
                                 <div class="info-value"><?= nl2br(htmlspecialchars($report['description'])) ?></div>
