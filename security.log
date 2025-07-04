@@ -40,3 +40,13 @@
 2025-06-30 01:03:11 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
 2025-06-30 12:47:12 - Successful login - ::1 - User ID: 5, Email: maajean@gmail.com
 2025-06-30 18:18:47 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-02 01:38:57 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 15:01:53 - Successful registration - ::1 - Email: zack24@gmail.com
+2025-07-04 15:02:13 - Successful login - ::1 - User ID: 6, Email: zack24@gmail.com
+2025-07-04 17:04:00 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 17:15:21 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 19:18:15 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 19:40:11 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 19:51:47 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-04 19:53:12 - Failed login attempt - ::1 - Email: zack23@gmail.com - Invalid password
+2025-07-04 19:54:08 - Failed login attempt - ::1 - Email: zack23@gmail.com - Invalid password

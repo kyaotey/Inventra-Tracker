@@ -25,6 +25,22 @@ CREATE TABLE reports (
     FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- New table for multiple media files (photos and videos)
+CREATE TABLE report_media (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_type ENUM('image', 'video') NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    is_primary TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
+    INDEX idx_report_id (report_id),
+    INDEX idx_file_type (file_type)
+);
+
 CREATE TABLE IF NOT EXISTS notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,

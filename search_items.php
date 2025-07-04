@@ -42,7 +42,10 @@ if (!empty($_POST['date_to'])) {
     $types .= 's';
 }
 
-$query = "SELECT r.*, u.name as reporter_name FROM reports r LEFT JOIN users u ON r.reported_by = u.id $where ORDER BY r.created_at DESC";
+$query = "SELECT r.*, u.name as reporter_name, 
+                 (SELECT rm.file_path FROM report_media rm WHERE rm.report_id = r.id ORDER BY rm.is_primary DESC, rm.created_at ASC LIMIT 1) as first_media,
+                 (SELECT rm.file_type FROM report_media rm WHERE rm.report_id = r.id ORDER BY rm.is_primary DESC, rm.created_at ASC LIMIT 1) as first_media_type
+          FROM reports r LEFT JOIN users u ON r.reported_by = u.id $where ORDER BY r.created_at DESC";
 
 if (!empty($params)) {
     $stmt = $conn->prepare($query);
@@ -74,10 +77,40 @@ if ($result->num_rows > 0) {
             $category_text = 'Pet';
         }
         
-        echo "
-        <div class='col-lg-4 col-md-6 mb-4'>
-            <div class='item-card h-100'>
-                <div class='card-body p-4'>
+        // Check if there's media to display
+        $mediaDisplay = '';
+        if (!empty($row['first_media'])) {
+            if ($row['first_media_type'] === 'image') {
+                $mediaDisplay = "
+                <div class='card-media-container'>
+                    <img src='{$row['first_media']}' alt='{$row['title']}' class='card-media-image'>
+                </div>";
+            } elseif ($row['first_media_type'] === 'video') {
+                $mediaDisplay = "
+                <div class='card-media-container'>
+                    <video src='{$row['first_media']}' class='card-media-video' muted>
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class='video-overlay'>
+                        <i class='fas fa-play'></i>
+                    </div>
+                </div>";
+            }
+        }
+        
+                        echo "
+                <div class='col-12 mb-4'>
+                    <div class='item-card'>
+                        <div class='row g-0'>
+                            " . (!empty($row['first_media']) ? "
+                            <div class='col-md-3'>
+                                {$mediaDisplay}
+                            </div>
+                            <div class='col-md-9'>
+                            " : "
+                            <div class='col-12'>
+                            ") . "
+                                <div class='card-body p-4'>
                     <div class='d-flex justify-content-between align-items-start mb-3'>
                         <h5 class='card-title fw-bold mb-0'>{$row['title']}</h5>
                         <div class='d-flex gap-2'>
@@ -97,7 +130,7 @@ if ($result->num_rows > 0) {
                             <i class='fas fa-map-marker-alt me-2'></i>
                             <strong>Location:</strong> {$row['location']}
                         </p>
-                        <p class='card-text'>" . substr($row['description'], 0, 150) . (strlen($row['description']) > 150 ? '...' : '') . "</p>
+                        <p class='card-text'>" . substr($row['description'], 0, 200) . (strlen($row['description']) > 200 ? '...' : '') . "</p>
                     </div>
                     <div class='d-flex justify-content-between align-items-center'>
                         <small class='text-muted'>
@@ -110,9 +143,11 @@ if ($result->num_rows > 0) {
                         </small>
                     </div>
                     <div class='mt-3'>
-                        <a href='view.php?id={$row['id']}' class='btn btn-outline-primary btn-sm w-100'>
+                        <a href='view.php?id={$row['id']}' class='btn btn-outline-primary btn-sm'>
                             <i class='fas fa-eye me-1'></i>View Details
                         </a>
+                    </div>
+                        </div>
                     </div>
                 </div>
             </div>

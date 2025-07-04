@@ -48,37 +48,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!in_array($type, ['lost', 'found'])) {
         $error_message = "Invalid report type.";
     } else {
-        // Handle file upload if provided
-        $photo_path = null;
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-            $max_size = 5 * 1024 * 1024; // 5MB
+        // Handle multiple media uploads
+        $uploadedMedia = [];
+        $photo_path = null; // Keep for backward compatibility
+        
+        if (isset($_FILES['media']) && !empty($_FILES['media']['name'][0])) {
+            $uploadResult = uploadMediaFiles($_FILES['media']);
             
-            if (in_array($_FILES['photo']['type'], $allowed_types) && $_FILES['photo']['size'] <= $max_size) {
-                $upload_dir = 'uploads/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
+            if ($uploadResult['success']) {
+                $uploadedMedia = $uploadResult['files'];
+                // Set primary photo for backward compatibility
+                if (!empty($uploadedMedia)) {
+                    $photo_path = $uploadedMedia[0]['file_path'];
                 }
                 
-                $file_extension = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-                $filename = uniqid() . '.' . $file_extension;
-                $photo_path = $upload_dir . $filename;
-                
-                if (move_uploaded_file($_FILES['photo']['tmp_name'], $photo_path)) {
-                    // File uploaded successfully
-                } else {
-                    $error_message = "Failed to upload photo.";
+                if (!empty($uploadResult['errors'])) {
+                    $error_message = "Some files failed to upload: " . implode(', ', $uploadResult['errors']);
                 }
             } else {
-                $error_message = "Invalid photo format or size. Please use JPEG, PNG, or GIF under 5MB.";
+                $error_message = $uploadResult['error'];
             }
         }
 
         if (empty($error_message)) {
+            // Insert report
             $stmt = $conn->prepare("INSERT INTO reports (title, type, category, description, location, contact_info, photo, reported_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("sssssssi", $title, $type, $category, $description, $location, $contact_info, $photo_path, $user_id);
             
             if ($stmt->execute()) {
+                $reportId = $conn->insert_id;
+                
+                // Insert media files
+                if (!empty($uploadedMedia)) {
+                    $mediaStmt = $conn->prepare("INSERT INTO report_media (report_id, file_path, file_type, file_name, file_size, mime_type, is_primary) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    
+                    foreach ($uploadedMedia as $index => $media) {
+                        $isPrimary = $index === 0 ? 1 : 0;
+                        $mediaStmt->bind_param("isssssi", $reportId, $media['file_path'], $media['file_type'], $media['file_name'], $media['file_size'], $media['mime_type'], $isPrimary);
+                        $mediaStmt->execute();
+                    }
+                }
+                
                 $success_message = "Pet report submitted successfully! Your pet has been added to our database.";
                 // Clear form data
                 $_POST = array();
@@ -455,21 +465,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-text">This will be shown to help people contact you about the pet</div>
                         </div>
 
-                        <!-- Photo Upload -->
+                        <!-- Media Upload -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Pet's Photo (Optional but Recommended)</label>
-                            <div class="file-upload" onclick="document.getElementById('photo').click()">
-                                <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
+                            <label class="form-label fw-bold">Pet's Photos & Videos (Optional but Recommended)</label>
+                            <div class="file-upload" onclick="document.getElementById('media').click()">
+                                <input type="file" id="media" name="media[]" accept="image/*,video/*" multiple style="display: none;">
                                 <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-3"></i>
-                                <h5>Upload a Photo</h5>
-                                <p class="text-muted mb-0">Click to select or drag and drop an image</p>
-                                <small class="text-muted">Supports: JPEG, PNG, GIF (Max 5MB)</small>
+                                <h5>Upload Photos & Videos</h5>
+                                <p class="text-muted mb-0">Click to select or drag and drop multiple files</p>
+                                <small class="text-muted">Supports: JPEG, PNG, GIF, WebP, MP4, AVI, MOV, WMV, FLV, WebM, MKV (Max 10MB each)</small>
                             </div>
-                            <div id="preview-container" style="display: none;">
-                                <img id="preview-image" class="preview-image" src="" alt="Preview">
-                                <button type="button" class="btn btn-sm btn-outline-warning mt-2" onclick="removePhoto()">
-                                    <i class="fas fa-times me-1"></i>Remove Photo
-                                </button>
+                            <div id="media-preview-container" class="mt-3">
+                                <!-- Media previews will be displayed here -->
                             </div>
                         </div>
 
@@ -505,22 +512,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('type-' + type).checked = true;
         }
 
-        // File upload preview
-        document.getElementById('photo').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
+        // Multiple media upload preview
+        document.getElementById('media').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const container = document.getElementById('media-preview-container');
+            container.innerHTML = '';
+            
+            files.forEach((file, index) => {
                 const reader = new FileReader();
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'media-preview-item d-inline-block me-3 mb-3 position-relative';
+                previewDiv.style.maxWidth = '150px';
+                
                 reader.onload = function(e) {
-                    document.getElementById('preview-image').src = e.target.result;
-                    document.getElementById('preview-container').style.display = 'block';
+                    if (file.type.startsWith('image/')) {
+                        previewDiv.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                            <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0" 
+                                    onclick="removeMediaFile(${index})" style="transform: translate(50%, -50%);">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="mt-1">
+                                <small class="text-muted">${file.name}</small>
+                            </div>
+                        `;
+                    } else if (file.type.startsWith('video/')) {
+                        previewDiv.innerHTML = `
+                            <video src="${e.target.result}" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;" controls></video>
+                            <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0" 
+                                    onclick="removeMediaFile(${index})" style="transform: translate(50%, -50%);">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="mt-1">
+                                <small class="text-muted">${file.name}</small>
+                            </div>
+                        `;
+                    }
                 };
+                
                 reader.readAsDataURL(file);
-            }
+                container.appendChild(previewDiv);
+            });
         });
 
-        function removePhoto() {
-            document.getElementById('photo').value = '';
-            document.getElementById('preview-container').style.display = 'none';
+        function removeMediaFile(index) {
+            const input = document.getElementById('media');
+            const dt = new DataTransfer();
+            const files = Array.from(input.files);
+            
+            files.forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file);
+                }
+            });
+            
+            input.files = dt.files;
+            
+            // Trigger change event to update preview
+            const event = new Event('change');
+            input.dispatchEvent(event);
         }
 
         // Drag and drop functionality
@@ -542,9 +592,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                document.getElementById('photo').files = files;
+                const input = document.getElementById('media');
+                const dt = new DataTransfer();
+                
+                // Add existing files
+                Array.from(input.files).forEach(file => dt.items.add(file));
+                
+                // Add new files
+                Array.from(files).forEach(file => dt.items.add(file));
+                
+                input.files = dt.files;
                 const event = new Event('change');
-                document.getElementById('photo').dispatchEvent(event);
+                input.dispatchEvent(event);
             }
         });
 

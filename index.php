@@ -198,6 +198,259 @@ if (isset($_SESSION['user_id'])) {
             background: var(--surface-glass);
             color: var(--text-main);
         }
+        
+        /* Search icon animation - Clash of Clans style */
+        .fa-search-location {
+            animation: cocSearch 2s ease-in-out infinite;
+            position: relative;
+        }
+        
+        @keyframes cocSearch {
+            0% {
+                transform: scale(1) rotate(0deg) translateX(0px) scaleX(1);
+                opacity: 1;
+            }
+            5% {
+                transform: scale(1.02) rotate(-3deg) translateX(-3px) scaleX(-1);
+                opacity: 0.98;
+            }
+            10% {
+                transform: scale(1.05) rotate(-8deg) translateX(-6px) scaleX(-1);
+                opacity: 0.95;
+            }
+            15% {
+                transform: scale(1.08) rotate(-12deg) translateX(-8px) scaleX(-1);
+                opacity: 0.92;
+            }
+            20% {
+                transform: scale(1.1) rotate(-15deg) translateX(-10px) scaleX(-1);
+                opacity: 0.9;
+            }
+            25% {
+                transform: scale(1.12) rotate(-18deg) translateX(-11px) scaleX(-1);
+                opacity: 0.88;
+            }
+            30% {
+                transform: scale(1.15) rotate(-20deg) translateX(-12px) scaleX(-1);
+                opacity: 1;
+            }
+            35% {
+                transform: scale(1.12) rotate(-18deg) translateX(-11px) scaleX(-1);
+                opacity: 0.88;
+            }
+            40% {
+                transform: scale(1.1) rotate(-15deg) translateX(-10px) scaleX(-1);
+                opacity: 0.9;
+            }
+            45% {
+                transform: scale(1.08) rotate(-12deg) translateX(-8px) scaleX(-1);
+                opacity: 0.92;
+            }
+            50% {
+                transform: scale(1.05) rotate(0deg) translateX(0px) scaleX(1);
+                opacity: 1;
+            }
+            55% {
+                transform: scale(1.02) rotate(3deg) translateX(3px) scaleX(1);
+                opacity: 0.98;
+            }
+            60% {
+                transform: scale(1.05) rotate(8deg) translateX(6px) scaleX(1);
+                opacity: 0.95;
+            }
+            65% {
+                transform: scale(1.08) rotate(12deg) translateX(8px) scaleX(1);
+                opacity: 0.92;
+            }
+            70% {
+                transform: scale(1.1) rotate(15deg) translateX(10px) scaleX(1);
+                opacity: 0.9;
+            }
+            75% {
+                transform: scale(1.12) rotate(18deg) translateX(11px) scaleX(1);
+                opacity: 0.88;
+            }
+            80% {
+                transform: scale(1.15) rotate(20deg) translateX(12px) scaleX(1);
+                opacity: 1;
+            }
+            85% {
+                transform: scale(1.12) rotate(18deg) translateX(11px) scaleX(1);
+                opacity: 0.88;
+            }
+            90% {
+                transform: scale(1.1) rotate(15deg) translateX(10px) scaleX(1);
+                opacity: 0.9;
+            }
+            95% {
+                transform: scale(1.08) rotate(12deg) translateX(8px) scaleX(1);
+                opacity: 0.92;
+            }
+            100% {
+                transform: scale(1) rotate(0deg) translateX(0px) scaleX(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Radar pulse effect */
+        .fa-search-location::before {
+            animation: radarPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes radarPulse {
+            0% {
+                text-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+            }
+            25% {
+                text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.4);
+            }
+            50% {
+                text-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.5);
+            }
+            75% {
+                text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.4);
+            }
+            100% {
+                text-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+            }
+        }
+        
+        /* Add scanning beam effect */
+        .fa-search-location::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 2px solid transparent;
+            border-top: 2px solid rgba(99, 102, 241, 0.6);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            animation: scanningBeam 2s linear infinite;
+        }
+        
+        @keyframes scanningBeam {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(-45deg);
+            }
+            12.5% {
+                width: 25px;
+                height: 25px;
+                opacity: 0.8;
+                transform: translate(-50%, -50%) rotate(-22.5deg);
+            }
+            25% {
+                width: 40px;
+                height: 40px;
+                opacity: 0.6;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            37.5% {
+                width: 50px;
+                height: 50px;
+                opacity: 0.4;
+                transform: translate(-50%, -50%) rotate(22.5deg);
+            }
+            50% {
+                width: 60px;
+                height: 60px;
+                opacity: 0.2;
+                transform: translate(-50%, -50%) rotate(45deg);
+            }
+            62.5% {
+                width: 50px;
+                height: 50px;
+                opacity: 0.4;
+                transform: translate(-50%, -50%) rotate(67.5deg);
+            }
+            75% {
+                width: 40px;
+                height: 40px;
+                opacity: 0.6;
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+            87.5% {
+                width: 25px;
+                height: 25px;
+                opacity: 0.8;
+                transform: translate(-50%, -50%) rotate(112.5deg);
+            }
+            100% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(135deg);
+            }
+        }
+        
+        /* Card Media Styles */
+        .card-media-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 15px 0 0 15px;
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .card-media-container {
+                border-radius: 15px 15px 0 0;
+                height: 150px;
+            }
+        }
+        
+        .card-media-image,
+        .card-media-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .item-card:hover .card-media-image,
+        .item-card:hover .card-media-video {
+            transform: scale(1.05);
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+        
+        .item-card:hover .video-overlay {
+            background: rgba(99, 102, 241, 0.8);
+        }
+        
+        /* Fallback for cards without media */
+        .item-card:not(:has(.card-media-container)) .card-body {
+            border-radius: 15px;
+        }
+        
+        /* Horizontal card layout adjustments */
+        .item-card .row {
+            margin: 0;
+        }
+        
+        .item-card .col-md-3,
+        .item-card .col-md-9 {
+            padding: 0;
+        }
         .stats-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
@@ -464,9 +717,12 @@ if (isset($_SESSION['user_id'])) {
             $types[] = 's';
         }
 
-        $query = "SELECT r.*, u.name as reporter_name FROM reports r 
-                 LEFT JOIN users u ON r.reported_by = u.id 
-                 $where ORDER BY r.created_at DESC";
+        $query = "SELECT r.*, u.name as reporter_name, 
+                         (SELECT rm.file_path FROM report_media rm WHERE rm.report_id = r.id ORDER BY rm.is_primary DESC, rm.created_at ASC LIMIT 1) as first_media,
+                         (SELECT rm.file_type FROM report_media rm WHERE rm.report_id = r.id ORDER BY rm.is_primary DESC, rm.created_at ASC LIMIT 1) as first_media_type
+                  FROM reports r 
+                  LEFT JOIN users u ON r.reported_by = u.id 
+                  $where ORDER BY r.created_at DESC";
         
         if (!empty($params)) {
             $stmt = $conn->prepare($query);
@@ -498,48 +754,80 @@ if (isset($_SESSION['user_id'])) {
                     $category_text = 'Pet';
                 }
                 
+                // Check if there's media to display
+                $mediaDisplay = '';
+                if (!empty($row['first_media'])) {
+                    if ($row['first_media_type'] === 'image') {
+                        $mediaDisplay = "
+                        <div class='card-media-container'>
+                            <img src='{$row['first_media']}' alt='{$row['title']}' class='card-media-image'>
+                        </div>";
+                    } elseif ($row['first_media_type'] === 'video') {
+                        $mediaDisplay = "
+                        <div class='card-media-container'>
+                            <video src='{$row['first_media']}' class='card-media-video' muted>
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class='video-overlay'>
+                                <i class='fas fa-play'></i>
+                            </div>
+                        </div>";
+                    }
+                }
+                
                 echo "
-                <div class='col-lg-4 col-md-6 mb-4'>
-                    <div class='item-card h-100'>
-                        <div class='card-body p-4'>
-                            <div class='d-flex justify-content-between align-items-start mb-3'>
-                                <h5 class='card-title fw-bold mb-0'>{$row['title']}</h5>
-                                <div class='d-flex gap-2'>
-                                    <span class='status-badge bg-{$category_color} text-white'>
-                                        <i class='fas {$category_icon} me-1'></i>{$category_text}
-                                    </span>
-                                    <span class='status-badge bg-{$type_color} text-white'>
-                                        <i class='fas {$type_icon} me-1'></i>{$row['type']}
-                                    </span>
-                                    <span class='status-badge bg-{$status_color} text-white'>
-                                        {$row['status']}
-                                    </span>
+                <div class='col-12 mb-4'>
+                    <div class='item-card'>
+                        <div class='row g-0'>
+                            " . (!empty($row['first_media']) ? "
+                            <div class='col-md-3'>
+                                {$mediaDisplay}
+                            </div>
+                            <div class='col-md-9'>
+                            " : "
+                            <div class='col-12'>
+                            ") . "
+                                <div class='card-body p-4'>
+                                    <div class='d-flex justify-content-between align-items-start mb-3'>
+                                        <h5 class='card-title fw-bold mb-0'>{$row['title']}</h5>
+                                        <div class='d-flex gap-2'>
+                                            <span class='status-badge bg-{$category_color} text-white'>
+                                                <i class='fas {$category_icon} me-1'></i>{$category_text}
+                                            </span>
+                                            <span class='status-badge bg-{$type_color} text-white'>
+                                                <i class='fas {$type_icon} me-1'></i>{$row['type']}
+                                            </span>
+                                            <span class='status-badge bg-{$status_color} text-white'>
+                                                {$row['status']}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class='mb-3'>
+                                        <p class='text-muted mb-2'>
+                                            <i class='fas fa-map-marker-alt me-2'></i>
+                                            <strong>Location:</strong> {$row['location']}
+                                        </p>
+                                        <p class='card-text'>" . substr($row['description'], 0, 200) . (strlen($row['description']) > 200 ? '...' : '') . "</p>
+                                    </div>
+                                    
+                                    <div class='d-flex justify-content-between align-items-center'>
+                                        <small class='text-muted'>
+                                            <i class='fas fa-user me-1'></i>
+                                            {$row['reporter_name']}
+                                        </small>
+                                        <small class='text-muted'>
+                                            <i class='fas fa-calendar me-1'></i>
+                                            " . date('M j, Y', strtotime($row['created_at'])) . "
+                                        </small>
+                                    </div>
+                                    
+                                    <div class='mt-3'>
+                                        <a href='view.php?id={$row['id']}' class='btn btn-outline-primary btn-sm'>
+                                            <i class='fas fa-eye me-1'></i>View Details
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div class='mb-3'>
-                                <p class='text-muted mb-2'>
-                                    <i class='fas fa-map-marker-alt me-2'></i>
-                                    <strong>Location:</strong> {$row['location']}
-                                </p>
-                                <p class='card-text'>" . substr($row['description'], 0, 150) . (strlen($row['description']) > 150 ? '...' : '') . "</p>
-                            </div>
-                            
-                            <div class='d-flex justify-content-between align-items-center'>
-                                <small class='text-muted'>
-                                    <i class='fas fa-user me-1'></i>
-                                    {$row['reporter_name']}
-                                </small>
-                                <small class='text-muted'>
-                                    <i class='fas fa-calendar me-1'></i>
-                                    " . date('M j, Y', strtotime($row['created_at'])) . "
-                                </small>
-                            </div>
-                            
-                            <div class='mt-3'>
-                                <a href='view.php?id={$row['id']}' class='btn btn-outline-primary btn-sm w-100'>
-                                    <i class='fas fa-eye me-1'></i>View Details
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -595,15 +883,6 @@ if (isset($_SESSION['user_id'])) {
     <footer class="text-center py-4 mt-5" style="color:#6366f1;font-weight:600;opacity:0.8;">
         &copy; <?= date('Y') ?> Inventra. All rights reserved.
     </footer>
-
-    <!-- Floating Action Button -->
-    <?php if (isset($_SESSION['user_id'])): ?>
-        <div class="floating-action">
-            <a href="report.php" class="floating-btn d-flex align-items-center justify-content-center text-decoration-none">
-                <i class="fas fa-plus"></i>
-            </a>
-        </div>
-    <?php endif; ?>
 
     <?php if ($show_welcome): ?>
     <div class="welcome-popup" id="welcomePopup">
