@@ -1,4 +1,11 @@
-<?php require 'includes/auth.php'; require 'includes/db.php'; ?>
+<?php 
+require 'includes/auth.php'; 
+require 'includes/db.php'; 
+require 'includes/security.php';
+
+// Generate CSRF token for any forms
+$csrf_token = generateCSRFToken();
+?>
 <!DOCTYPE html>
 <html>
 <head>

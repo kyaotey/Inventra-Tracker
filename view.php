@@ -744,7 +744,7 @@ if (isset($_GET['id'])) {
                         ?>
                         <div class="mb-3">
                             <?php if (isset($_SESSION['user_id'])): ?>
-                            <form method="post" class="d-flex align-items-start gap-2">
+                            <form method="post" class="d-flex align-items-start gap-2" id="comment-form">
                                 <textarea name="comment" class="form-control rounded-3 shadow-sm" rows="2" placeholder="Add a comment..." required></textarea>
                                 <button type="submit" name="add_comment" class="btn btn-primary rounded-3 shadow-sm"><i class="fas fa-paper-plane"></i></button>
                             </form>
@@ -781,8 +781,9 @@ if (isset($_GET['id'])) {
                                                 <?php endif; ?>
                                             </div>
                                             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
-                                                <form method="post" class="d-inline">
-                                                    <button type="submit" name="delete_comment" value="<?= $c['id'] ?>" class="btn btn-sm btn-danger">
+                                                <form method="post" class="d-inline" id="delete-form-<?= $c['id'] ?>">
+                                                    <input type="hidden" name="delete_comment" value="<?= $c['id'] ?>">
+                                                    <button type="button" onclick="confirmDeleteComment(<?= $c['id'] ?>)" class="btn btn-sm btn-danger">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -820,8 +821,9 @@ if (isset($_GET['id'])) {
                                                     </div>
                                                     <div class="text-muted" style="font-size:0.95rem;">"<?= htmlspecialchars($reply['comment']) ?>"</div>
                                                     <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
-                                                        <form method="post" class="position-absolute top-0 end-0 m-2">
-                                                            <button type="submit" name="delete_comment" value="<?= $reply['id'] ?>" class="btn btn-sm btn-danger">
+                                                        <form method="post" class="position-absolute top-0 end-0 m-2" id="delete-form-reply-<?= $reply['id'] ?>">
+                                                            <input type="hidden" name="delete_comment" value="<?= $reply['id'] ?>">
+                                                            <button type="button" onclick="confirmDeleteComment('reply-<?= $reply['id'] ?>')" class="btn btn-sm btn-danger">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         </form>
@@ -1431,8 +1433,9 @@ if (isset($_GET['id'])) {
                                             <?php endif; ?>
                                         </div>
                                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
-                                            <form method="post" class="d-inline">
-                                                <button type="submit" name="delete_comment" value="<?= $c['id'] ?>" class="btn btn-sm btn-danger">
+                                            <form method="post" class="d-inline" id="delete-form-<?= $c['id'] ?>">
+                                                <input type="hidden" name="delete_comment" value="<?= $c['id'] ?>">
+                                                <button type="button" onclick="confirmDeleteComment(<?= $c['id'] ?>)" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -1470,8 +1473,9 @@ if (isset($_GET['id'])) {
                                                 </div>
                                                 <div class="text-muted" style="font-size:0.95rem;">"<?= htmlspecialchars($reply['comment']) ?>"</div>
                                                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
-                                                    <form method="post" class="position-absolute top-0 end-0 m-2">
-                                                        <button type="submit" name="delete_comment" value="<?= $reply['id'] ?>" class="btn btn-sm btn-danger">
+                                                    <form method="post" class="position-absolute top-0 end-0 m-2" id="delete-form-reply-<?= $reply['id'] ?>">
+                                                        <input type="hidden" name="delete_comment" value="<?= $reply['id'] ?>">
+                                                        <button type="button" onclick="confirmDeleteComment('reply-<?= $reply['id'] ?>')" class="btn btn-sm btn-danger">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -1498,4 +1502,18 @@ if (isset($_GET['id'])) {
     </div>
 </body>
 </html>
+
+<script>
+function confirmDeleteComment(id) {
+    if (confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
+        var form = document.getElementById('delete-form-' + id) ||
+                   document.getElementById('delete-form-reply-' + id) ||
+                   document.getElementById('delete-form-modal-' + id) ||
+                   document.getElementById('delete-form-modal-reply-' + id);
+        if (form) form.submit();
+    }
+}
+</script>
+
+
 

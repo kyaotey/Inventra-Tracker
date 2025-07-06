@@ -3,8 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 require "includes/security.php";
-require "includes/db.php";
 session_start();
+require "includes/db.php";
 
 // Redirect if not logged in
 if (!isset($_SESSION["user_id"])) {
@@ -112,10 +112,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             }
                         }
                         
-                        // Redirect after successful profile update
+                        // Set success message and redirect after successful profile update
                         if (empty($error_message)) {
                             // Debug: Log the redirect attempt
                             error_log("Profile update successful, redirecting to index.php");
+                            
+                            // Create specific success message based on what was updated
+                            $success_message = "Profile information updated successfully!";
+                            if ($password_updated) {
+                                $success_message = "Profile and password updated successfully!";
+                            } elseif (!empty($_FILES['profile_photo']['name'])) {
+                                $success_message = "Profile and photo updated successfully!";
+                            }
+                            
+                            $_SESSION['profile_update_success'] = $success_message;
                             header("Location: index.php");
                             exit;
                         } else {
@@ -135,6 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     // Fallback redirect if we reach here without errors
     if (empty($error_message)) {
+        $_SESSION['profile_update_success'] = "Profile updated successfully!";
         header("Location: index.php");
         exit;
     }

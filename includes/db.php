@@ -1,18 +1,19 @@
 <?php
-// Database configuration for production hosting
-// Update these values with your hosting provider's database credentials
-
-
-
-// For development, you can use these local settings:
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$dbname = 'missing_items_db';
-
-// Set error reporting for production (hide errors from users)
-error_reporting(0);
-ini_set('display_errors', 0); // Hide errors in production
+// Load configuration if available, otherwise use defaults
+if (file_exists(__DIR__ . '/../config.php')) {
+    require_once __DIR__ . '/../config.php';
+    $config = getDatabaseConfig();
+    $host = $config['host'];
+    $user = $config['user'];
+    $pass = $config['pass'];
+    $dbname = $config['name'];
+} else {
+    // Fallback to default configuration
+    $host = 'localhost';
+    $user = 'root';
+    $pass = '';
+    $dbname = 'missing_items_db';
+}
 
 try {
     $conn = new mysqli($host, $user, $pass, $dbname);
@@ -23,10 +24,14 @@ try {
     }
     
     // Set charset to prevent SQL injection
-    $conn->set_charset("utf8mb4");
+    if (!$conn->set_charset("utf8mb4")) {
+        error_log("Failed to set database charset: " . $conn->error);
+    }
     
     // Set timezone
-    $conn->query("SET time_zone = '+00:00'");
+    if (!$conn->query("SET time_zone = '+00:00'")) {
+        error_log("Failed to set database timezone: " . $conn->error);
+    }
     
 } catch (Exception $e) {
     error_log("Database connection exception: " . $e->getMessage());

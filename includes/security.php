@@ -1,12 +1,20 @@
 <?php
 // Security configuration and headers
 
+// Load configuration if available
+if (file_exists(__DIR__ . '/../config.php')) {
+    require_once __DIR__ . '/../config.php';
+}
+
 // Set secure session configuration (only if session hasn't started)
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.cookie_httponly', 1);
-    ini_set('session.cookie_secure', 0); // Set to 1 if using HTTPS
+    ini_set('session.cookie_secure', function_exists('isProduction') && isProduction() ? 1 : 0); // Set to 1 if using HTTPS in production
     ini_set('session.use_strict_mode', 1);
     ini_set('session.cookie_samesite', 'Strict');
+    if (defined('SESSION_TIMEOUT')) {
+        ini_set('session.gc_maxlifetime', SESSION_TIMEOUT);
+    }
 }
 
 // Security headers

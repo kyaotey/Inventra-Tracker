@@ -8,6 +8,13 @@ if (isset($_SESSION['show_welcome']) && $_SESSION['show_welcome'] && isset($_SES
     $show_welcome = true;
     unset($_SESSION['show_welcome']); // Only show once
 }
+
+// Show profile update success message
+$profile_update_success = false;
+if (isset($_SESSION['profile_update_success'])) {
+    $profile_update_success = $_SESSION['profile_update_success'];
+    unset($_SESSION['profile_update_success']); // Only show once
+}
 // Fetch profile photo for navbar
 $profile_photo = null;
 if (isset($_SESSION['user_id'])) {
@@ -561,6 +568,76 @@ if (isset($_SESSION['user_id'])) {
                 min-width: unset;
             }
         }
+        
+        /* Success Popup Styles */
+        .success-popup {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            background: linear-gradient(135deg, #10b981 60%, #34d399 100%);
+            color: #fff;
+            padding: 1.25rem 2.2rem 1.25rem 1.5rem;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(16,185,129,0.22), 0 2px 8px rgba(0,0,0,0.10);
+            font-size: 1.15rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateY(-30px) scale(0.98);
+            min-width: 320px;
+            max-width: 90vw;
+            border: 1.5px solid #fff2;
+            overflow: hidden;
+        }
+        .success-popup.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        .success-popup .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.3rem;
+            margin-left: 1rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .success-popup .close-btn:hover {
+            opacity: 1;
+        }
+        .success-popup .icon-anim {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            margin-right: 0.5rem;
+            animation: popIn 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        .success-popup .progress-bar {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6ee7b7 0%, #10b981 100%);
+            border-radius: 0 0 18px 18px;
+            animation: progressBarAnim 4s linear forwards;
+        }
+        @media (max-width: 600px) {
+            .success-popup {
+                right: 0.5rem;
+                left: 0.5rem;
+                top: 1rem;
+                padding: 1rem 1.2rem 1rem 1rem;
+                font-size: 1rem;
+                min-width: unset;
+            }
+        }
     </style>
 </head>
 <body>
@@ -904,6 +981,31 @@ if (isset($_SESSION['user_id'])) {
                 setTimeout(function() {
                     popup.classList.remove('show');
                 }, 5300); // Auto-dismiss after 5s
+            }
+        });
+    </script>
+    <?php endif; ?>
+
+    <?php if ($profile_update_success): ?>
+    <div class="success-popup" id="successPopup">
+        <span class="icon-anim"><i class="fas fa-check-circle"></i></span>
+        <?= htmlspecialchars($profile_update_success) ?>
+        <button class="close-btn" onclick="closeSuccessPopup()" aria-label="Close">&times;</button>
+        <div class="progress-bar"></div>
+    </div>
+    <script>
+        function closeSuccessPopup() {
+            document.getElementById('successPopup').classList.remove('show');
+        }
+        window.addEventListener('DOMContentLoaded', function() {
+            var popup = document.getElementById('successPopup');
+            if (popup) {
+                setTimeout(function() {
+                    popup.classList.add('show');
+                }, 300); // Fade in
+                setTimeout(function() {
+                    popup.classList.remove('show');
+                }, 4300); // Auto-dismiss after 4s
             }
         });
     </script>
