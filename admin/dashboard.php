@@ -3,6 +3,7 @@ require '../includes/security.php';
 session_start();
 require '../includes/db.php';
 
+
 // Security check - ensure user is logged in and is admin
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     header('Location: ../login.php?error=unauthorized');
@@ -500,6 +501,7 @@ $user_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE is_admin =
                         <i class="fas fa-user-shield me-1"></i>
                         Welcome, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?>
                     </span>
+
                     <a class="nav-link" href="../index.php">
                         <i class="fas fa-home me-1"></i>View Site
                     </a>

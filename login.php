@@ -46,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     if ($result->num_rows === 1) {
                         $user = $result->fetch_assoc();
+                        
                         if (password_verify($password, $user['password'])) {
                             // Regenerate session ID for security
                             session_regenerate_id(true);

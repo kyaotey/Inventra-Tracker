@@ -3,6 +3,7 @@ require 'includes/security.php';
 session_start();
 require 'includes/db.php';
 
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php?error=login_required');
@@ -286,6 +287,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a class="nav-link" href="report_pet.php">
                         <i class="fas fa-paw text-warning me-1"></i>Report Pet
                     </a>
+
                 <?php endif; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="nav-item dropdown">

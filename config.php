@@ -80,4 +80,15 @@ function isDevelopment() {
 function isProduction() {
     return ENVIRONMENT === 'production';
 }
+
+function getEmailConfig() {
+    return [
+        'smtp_host' => 'smtp.gmail.com',
+        'smtp_port' => 587,
+        'smtp_username' => 'your-email@gmail.com',
+        'smtp_password' => 'your-app-password',
+        'from_email' => 'noreply@inventra.com',
+        'from_name' => 'Inventra Team'
+    ];
+}
 ?> 

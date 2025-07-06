@@ -58,3 +58,25 @@
 2025-07-06 19:47:16 - Successful registration - ::1 - Email: juliet123@gmail.com
 2025-07-06 19:47:23 - Successful login - ::1 - User ID: 7, Email: juliet123@gmail.com
 2025-07-06 20:01:02 - Successful login - ::1 - User ID: 1, Email: admin@example.com
+2025-07-06 20:59:57 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:01:56 - Successful registration - ::1 - Email: zack@gmail.com
+2025-07-06 21:02:15 - Successful login - ::1 - User ID: 2, Email: zack@gmail.com
+2025-07-06 21:24:32 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:24:40 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:25:31 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:26:48 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:32:56 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:37:36 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:41:25 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:41:31 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:44:42 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:46:04 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:46:09 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:47:56 - Failed login attempt - ::1 - Email: admin@tracker.com - Invalid password
+2025-07-06 21:48:03 - Failed login attempt - ::1 - Email: admin@tracker.com - Invalid password
+2025-07-06 21:49:44 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:56:26 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 21:56:33 - Rate limit exceeded - ::1 - Login attempts
+2025-07-06 21:57:02 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
+2025-07-06 22:05:00 - Successful login - ::1 - User ID: 5, Email: admin@example.com
+2025-07-06 22:05:27 - Successful login - ::1 - User ID: 5, Email: admin@example.com

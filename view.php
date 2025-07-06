@@ -3,6 +3,7 @@ require 'includes/security.php';
 session_start();
 require 'includes/db.php';
 
+
 // Fetch profile photo for navbar
 $profile_photo = null;
 if (isset($_SESSION['user_id'])) {
@@ -361,6 +362,7 @@ if (isset($_GET['id'])) {
                     <a class="nav-link" href="report_pet.php">
                         <i class="fas fa-paw text-warning me-1"></i>Report Pet
                     </a>
+
                 <?php endif; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="nav-item dropdown">
@@ -699,6 +701,12 @@ if (isset($_GET['id'])) {
                                 $stmt->bind_param("iis", $id, $user_id, $comment);
                             }
                             $stmt->execute();
+                            $comment_id = $conn->insert_id;
+                            
+            
+                            if ($comment_id) {
+                                // Comment added successfully
+                            }
                         }
                         // Handle comment deletion (admin only)
                         if (isset($_POST['delete_comment']) && isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {

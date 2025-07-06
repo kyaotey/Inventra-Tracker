@@ -38,10 +38,4 @@ try {
     die("Database connection error. Please try again later.");
 }
 
-function createNotification($conn, $user_id, $message) {
-    $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
-    $stmt->bind_param("is", $user_id, $message);
-    $stmt->execute();
-    $stmt->close();
-}
 ?>

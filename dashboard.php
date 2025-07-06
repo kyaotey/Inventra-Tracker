@@ -3,6 +3,7 @@ require 'includes/auth.php';
 require 'includes/db.php'; 
 require 'includes/security.php';
 
+
 // Generate CSRF token for any forms
 $csrf_token = generateCSRFToken();
 ?>
@@ -124,6 +125,7 @@ $csrf_token = generateCSRFToken();
                     <a class="nav-link" href="report_pet.php">
                         <i class="fas fa-paw text-warning me-1"></i>Report Pet
                     </a>
+
                 <?php endif; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="nav-item dropdown">
