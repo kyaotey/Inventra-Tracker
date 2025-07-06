@@ -95,6 +95,15 @@ try {
         echo "<br>✅ No existing photos to migrate<br>";
     }
 
+    // Add profile_photo column to users table if it doesn't exist
+    $checkProfilePhotoColumn = $conn->query("SHOW COLUMNS FROM users LIKE 'profile_photo'");
+    if ($checkProfilePhotoColumn->num_rows == 0) {
+        $conn->query("ALTER TABLE users ADD COLUMN profile_photo VARCHAR(255) DEFAULT NULL AFTER email");
+        echo "<p style='color: green;'>✓ Profile photo column added successfully</p>";
+    } else {
+        echo "<p style='color: blue;'>ℹ Profile photo column already exists</p>";
+    }
+
     echo "<p style='color: green;'><strong>Database update completed successfully!</strong></p>";
     echo "<p><a href='index.php'>← Back to Home</a></p>";
     

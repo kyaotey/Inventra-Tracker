@@ -280,4 +280,36 @@ function deleteMediaFile($mediaId, $conn) {
     
     return false;
 }
+
+// Upload profile photo
+function uploadProfilePhoto($file, $uploadDir = 'uploads/profile_photos/') {
+    // Validate file
+    $validation = validateFileUpload($file, ['jpg', 'jpeg', 'png', 'gif'], 5242880); // 5MB limit
+    if (!$validation) {
+        return ['success' => false, 'error' => 'Invalid file. Please upload a JPG, PNG, or GIF image under 5MB.'];
+    }
+    
+    // Create upload directory if it doesn't exist
+    if (!is_dir($uploadDir)) {
+        if (!mkdir($uploadDir, 0755, true)) {
+            return ['success' => false, 'error' => 'Failed to create upload directory'];
+        }
+    }
+    
+    // Generate unique filename
+    $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = 'profile_' . uniqid() . '_' . time() . '.' . $fileExtension;
+    $filePath = $uploadDir . $filename;
+    
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $filePath)) {
+        return [
+            'success' => true,
+            'file_path' => $filePath,
+            'file_name' => $filename
+        ];
+    } else {
+        return ['success' => false, 'error' => 'Failed to upload file'];
+    }
+}
 ?> 

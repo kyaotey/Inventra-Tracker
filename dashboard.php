@@ -157,7 +157,10 @@
         <div class="row">
             <?php
             $user_id = $_SESSION['user_id'];
-            $result = $conn->query("SELECT * FROM reports WHERE reported_by = $user_id ORDER BY created_at DESC");
+            $stmt = $conn->prepare("SELECT * FROM reports WHERE reported_by = ? ORDER BY created_at DESC");
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $status_color = $row['status'] === 'returned' ? 'success' : 'warning';

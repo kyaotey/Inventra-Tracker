@@ -1,6 +1,5 @@
 <?php
 require "includes/security.php";
-require "includes/sendbird.php";
 session_start();
 
 $error_message = "";
@@ -67,9 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $db_connected) {
                         
                         if ($stmt->execute()) {
                             logSecurityEvent('Successful registration', "Email: $email");
-                            // Sendbird integration: create user in Sendbird
-                            $new_user_id = $conn->insert_id;
-                            sendbird_create_user($new_user_id, $name);
                             header("Location: login.php?registered=1");
                             exit();
                         } else {

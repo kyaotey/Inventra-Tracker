@@ -2,11 +2,7 @@
 // Database configuration for production hosting
 // Update these values with your hosting provider's database credentials
 
-// For InfinityFree, these are typically provided in your hosting control panel
-$host = 'localhost'; // Usually 'localhost' for most free hosts
-$user = 'your_db_username'; // Replace with your database username
-$pass = 'your_db_password'; // Replace with your database password
-$dbname = 'your_db_name'; // Replace with your database name
+
 
 // For development, you can use these local settings:
 $host = 'localhost';
