@@ -29,11 +29,37 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
+// Edit mode: pre-fill form if id is present
+if (isset($_GET['id'])) {
+    $edit_id = intval($_GET['id']);
+    $stmt = $conn->prepare('SELECT * FROM reports WHERE id = ? AND category = "pet"');
+    $stmt->bind_param('i', $edit_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows === 1) {
+        $edit_report = $result->fetch_assoc();
+        $_POST['title'] = $edit_report['title'];
+        $_POST['type'] = $edit_report['type'];
+        $_POST['description'] = $edit_report['description'];
+        $_POST['location'] = $edit_report['location'];
+        $_POST['latitude'] = $edit_report['latitude'];
+        $_POST['longitude'] = $edit_report['longitude'];
+        $_POST['contact_info'] = $edit_report['contact_info'];
+        $_POST['pet_type'] = $edit_report['pet_type'] ?? '';
+        $_POST['breed'] = $edit_report['breed'] ?? '';
+        $_POST['color'] = $edit_report['color'] ?? '';
+        $_POST['size'] = $edit_report['size'] ?? '';
+        $_POST['last_seen'] = $edit_report['last_seen'] ?? '';
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $type = $_POST['type'];
     $description = trim($_POST['description']);
     $location = trim($_POST['location']);
+    $latitude = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+    $longitude = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
     $contact_info = trim($_POST['contact_info'] ?? '');
     $pet_type = $_POST['pet_type'] ?? '';
     $breed = $_POST['breed'] ?? '';
@@ -73,8 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($error_message)) {
             // Insert report
-            $stmt = $conn->prepare("INSERT INTO reports (title, type, category, description, location, contact_info, photo, reported_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssi", $title, $type, $category, $description, $location, $contact_info, $photo_path, $user_id);
+            $stmt = $conn->prepare("INSERT INTO reports (title, type, category, description, location, latitude, longitude, contact_info, photo, reported_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssddssi", $title, $type, $category, $description, $location, $latitude, $longitude, $contact_info, $photo_path, $user_id);
             
             if ($stmt->execute()) {
                 $reportId = $conn->insert_id;
@@ -113,6 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         :root {
             --primary-color: #f59e0b;
@@ -395,10 +423,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="mb-3">
                                     <label for="location" class="form-label fw-bold">Location *</label>
                                     <input type="text" class="form-control" id="location" name="location" 
-                                           placeholder="e.g., Central Park, Downtown Area" 
+                                           placeholder="Type location name..." 
                                            value="<?= htmlspecialchars($_POST['location'] ?? '') ?>" required>
+                                    <div class="form-text">Type a location and the map will show below</div>
+                                    <div id="location-loading" style="display:none;color:#6366f1;font-size:0.95em;"><i class="fas fa-spinner fa-spin me-1"></i>Searching for location...</div>
+                                    <div id="location-notfound" style="display:none;color:#ef4444;font-size:0.95em;"><i class="fas fa-exclamation-circle me-1"></i>Location not found. Please try a more specific name.</div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Map Preview -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold mb-0">Location Map Preview</label>
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#mapModal">
+                                    <i class="fas fa-expand"></i>
+                                    <span>Fullscreen</span>
+                                </button>
+                            </div>
+                            <div id="map" style="height: 300px; border-radius: 12px; border: 2px solid rgba(0,0,0,0.1);"></div>
+                            <input type="hidden" id="latitude" name="latitude" value="<?= htmlspecialchars($_POST['latitude'] ?? '') ?>">
+                            <input type="hidden" id="longitude" name="longitude" value="<?= htmlspecialchars($_POST['longitude'] ?? '') ?>">
                         </div>
 
                         <!-- Pet Information -->
@@ -503,7 +548,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Map Fullscreen Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-scroll="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel"><i class="fas fa-map-marked-alt me-2"></i>Location Map - Fullscreen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="mapFullscreen" style="width: 100%; height: calc(100vh - 120px);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
         function selectType(type) {
             // Remove selected class from all options
@@ -620,6 +683,189 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 e.preventDefault();
                 alert('Please select a report type (Lost Pet or Found Pet)');
                 return false;
+            }
+        });
+
+        // Map functionality
+        let map, marker;
+        let fullscreenMap = null;
+        
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing map...');
+            
+            // Check if map container exists
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) {
+                console.error('Map container not found!');
+                return;
+            }
+            
+            try {
+                // Initialize map with a default view
+                map = L.map('map').setView([0, 0], 2);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                console.log('Map initialized successfully');
+                
+                const geocoder = L.Control.geocoder({ defaultMarkGeocode: false })
+                    .on('markgeocode', function(e) {
+                        const latlng = e.geocode.center;
+                        setMarker(latlng.lat, latlng.lng, e.geocode.name);
+                        map.setView(latlng, 16);
+                    })
+                    .addTo(map);
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        setMarker(position.coords.latitude, position.coords.longitude, "Your current location");
+                        map.setView([position.coords.latitude, position.coords.longitude], 16);
+                    }, function() {
+                        map.setView([0, 0], 2);
+                    });
+                }
+                map.on('click', function(e) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    // Add or update marker
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker([lat, lng]).addTo(map);
+                    // Reverse geocode to get address
+                    fetch(`geocode.php?q=${lat},${lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let popupText = '';
+                            if (data && data.length > 0 && data[0].display_name) {
+                                popupText = `${data[0].display_name} (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                                document.getElementById('location').value = data[0].display_name;
+                            } else {
+                                popupText = `Location: (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                                document.getElementById('location').value = `Location: (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                            }
+                            marker.bindPopup(popupText).openPopup();
+                            document.getElementById('latitude').value = lat;
+                            document.getElementById('longitude').value = lng;
+                        })
+                        .catch(error => {
+                            console.error('Error reverse geocoding:', error);
+                            const popupText = `Location: (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                            marker.bindPopup(popupText).openPopup();
+                            document.getElementById('location').value = `Location: (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                            document.getElementById('latitude').value = lat;
+                            document.getElementById('longitude').value = lng;
+                        });
+                });
+                
+                // Listen for location input changes
+                const locationInput = document.getElementById('location');
+                let geocodeTimeout;
+                const locationLoading = document.getElementById('location-loading');
+                const locationNotFound = document.getElementById('location-notfound');
+                
+                locationInput.addEventListener('input', function() {
+                    const locationText = this.value.trim();
+                    // Hide not found message
+                    locationNotFound.style.display = 'none';
+                    // Clear previous timeout
+                    if (geocodeTimeout) {
+                        clearTimeout(geocodeTimeout);
+                    }
+                    // Only geocode if there's meaningful text (more than 3 characters)
+                    if (locationText.length > 3) {
+                        // Show loading
+                        locationLoading.style.display = 'block';
+                        geocodeTimeout = setTimeout(function() {
+                            console.log('Geocoding location:', locationText);
+                            // Geocode the location
+                            fetch(`geocode.php?q=${encodeURIComponent(locationText)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    locationLoading.style.display = 'none';
+                                    if (data && data.length > 0) {
+                                        const result = data[0];
+                                        const lat = parseFloat(result.lat);
+                                        const lng = parseFloat(result.lon);
+                                        console.log('Geocoded location:', lat, lng, result.display_name);
+                                        map.setView([lat, lng], 16);
+                                        if (marker) {
+                                            map.removeLayer(marker);
+                                        }
+                                        marker = L.marker([lat, lng]).addTo(map);
+                                        marker.bindPopup(result.display_name).openPopup();
+                                        document.getElementById('latitude').value = lat;
+                                        document.getElementById('longitude').value = lng;
+                                    } else {
+                                        // Show not found message
+                                        locationNotFound.style.display = 'block';
+                                    }
+                                })
+                                .catch(error => {
+                                    locationLoading.style.display = 'none';
+                                    locationNotFound.style.display = 'block';
+                                    console.error('Error geocoding location:', error);
+                                });
+                        }, 1000); // 1 second delay
+                    } else {
+                        locationLoading.style.display = 'none';
+                        locationNotFound.style.display = 'none';
+                    }
+                });
+                
+                function setMarker(lat, lng, popupText) {
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker([lat, lng]).addTo(map);
+                    let popup = popupText ? `${popupText} (${lat.toFixed(6)}, ${lng.toFixed(6)})` : `Location: (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                    marker.bindPopup(popup).openPopup();
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+                }
+                
+                // Handle fullscreen map modal
+                const mapModal = document.getElementById('mapModal');
+                if (mapModal) {
+                    mapModal.addEventListener('shown.bs.modal', function() {
+                        const fullscreenMapDiv = document.getElementById('mapFullscreen');
+                        if (fullscreenMapDiv && !fullscreenMap) {
+                            // Get current map center and zoom
+                            const center = map.getCenter();
+                            const zoom = map.getZoom();
+                            
+                            // Initialize fullscreen map
+                            fullscreenMap = L.map(fullscreenMapDiv, {
+                                center: center,
+                                zoom: zoom
+                            });
+                            
+                            // Add tile layer
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors'
+                            }).addTo(fullscreenMap);
+                            
+                            // Add marker if exists
+                            if (marker) {
+                                const markerLatLng = marker.getLatLng();
+                                const fullscreenMarker = L.marker(markerLatLng).addTo(fullscreenMap);
+                                fullscreenMarker.bindPopup(marker.getPopup().getContent()).openPopup();
+                            }
+                        }
+                    });
+                    
+                    mapModal.addEventListener('hidden.bs.modal', function() {
+                        // Clean up fullscreen map when modal is closed
+                        if (fullscreenMap) {
+                            fullscreenMap.remove();
+                            fullscreenMap = null;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:1.1rem;"><i class="fas fa-exclamation-triangle me-2"></i>Error loading map</div>';
             }
         });
     </script>

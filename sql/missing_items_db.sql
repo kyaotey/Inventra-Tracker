@@ -18,6 +18,8 @@ CREATE TABLE reports (
     category ENUM('item', 'person', 'pet') NOT NULL DEFAULT 'item',
     description TEXT NOT NULL,
     location VARCHAR(255) NOT NULL,
+    latitude DECIMAL(10, 8) DEFAULT NULL,
+    longitude DECIMAL(11, 8) DEFAULT NULL,
     contact_info TEXT,
     photo VARCHAR(255) DEFAULT NULL,
     status ENUM('pending', 'returned') DEFAULT 'pending',

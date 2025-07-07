@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = $_POST['category'];
     $description = trim($_POST['description']);
     $location = trim($_POST['location']);
+    $latitude = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+    $longitude = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
     $contact_info = trim($_POST['contact_info'] ?? '');
     $user_id = $_SESSION['user_id'];
 
@@ -77,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($error_message)) {
             // Insert report
-            $stmt = $conn->prepare("INSERT INTO reports (title, type, category, description, location, contact_info, photo, reported_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssi", $title, $type, $category, $description, $location, $contact_info, $photo_path, $user_id);
+            $stmt = $conn->prepare("INSERT INTO reports (title, type, category, description, location, latitude, longitude, contact_info, photo, reported_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssddssi", $title, $type, $category, $description, $location, $latitude, $longitude, $contact_info, $photo_path, $user_id);
             
             if ($stmt->execute()) {
                 $reportId = $conn->insert_id;
@@ -113,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --primary-color: #6366f1;
@@ -421,11 +424,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="mb-3">
                                     <label for="location" class="form-label fw-bold">Location *</label>
                                     <input type="text" class="form-control" id="location" name="location" 
-                                           placeholder="e.g., Library, Park, Mall" 
+                                           placeholder="Type location name..." 
                                            value="<?= htmlspecialchars($_POST['location'] ?? '') ?>" required>
+                                    <div class="form-text">Type a location and the map will show below</div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Map Preview -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Location Map Preview</label>
+                            <div class="d-flex gap-2 mb-2">
+                                <button type="button" id="useCurrentLocation" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-location-arrow me-1"></i>Use My Current Location
+                                </button>
+                                <small class="text-muted align-self-center">The map will automatically show your location when you load the page</small>
+                            </div>
+                            <div id="map" style="height: 300px; border-radius: 12px; border: 2px solid rgba(0, 0, 0, 0.1);"></div>
+                            <div class="form-text mt-2">Click on the map to set exact location or type a location name above</div>
+                        </div>
+
+                        <!-- Hidden coordinates -->
+                        <input type="hidden" id="latitude" name="latitude" value="<?= htmlspecialchars($_POST['latitude'] ?? '') ?>">
+                        <input type="hidden" id="longitude" name="longitude" value="<?= htmlspecialchars($_POST['longitude'] ?? '') ?>">
 
                         <!-- Category-specific fields -->
                         <div id="item-fields" class="category-fields active">
@@ -568,6 +589,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         function selectCategory(category) {
             // Remove selected class from all options
@@ -735,6 +757,222 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 e.preventDefault();
                 alert('Please select a type (Lost or Found)');
                 return false;
+            }
+        });
+
+        // Map functionality
+        let map, marker;
+        
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing map...');
+            
+            // Check if map container exists
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) {
+                console.error('Map container not found!');
+                return;
+            }
+            
+            try {
+                // Initialize map with a default view
+                map = L.map('map').setView([40.7128, -74.0060], 10); // Default to New York
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                console.log('Map initialized successfully');
+                
+                // Get current location and update map
+                if (navigator.geolocation) {
+                    console.log('Getting current location...');
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            console.log('Current location:', lat, lng);
+                            
+                            // Update map to current location
+                            map.setView([lat, lng], 16);
+                            
+                            // Add marker for current location
+                            marker = L.marker([lat, lng]).addTo(map);
+                            marker.bindPopup('Your current location').openPopup();
+                            
+                            // Get address for current location
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const address = data.display_name;
+                                    marker.bindPopup(`Your current location: ${address}`).openPopup();
+                                    document.getElementById('location').value = address;
+                                    document.getElementById('latitude').value = lat;
+                                    document.getElementById('longitude').value = lng;
+                                })
+                                .catch(error => {
+                                    console.error('Error getting address:', error);
+                                    marker.bindPopup(`Your current location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`).openPopup();
+                                    document.getElementById('location').value = `Current location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                                    document.getElementById('latitude').value = lat;
+                                    document.getElementById('longitude').value = lng;
+                                });
+                        },
+                        function(error) {
+                            console.log('Geolocation error:', error.message);
+                            // Keep default New York view if geolocation fails
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 300000 // 5 minutes
+                        }
+                    );
+                } else {
+                    console.log('Geolocation not supported');
+                }
+                
+                // Handle "Use My Location" button
+                document.getElementById('useCurrentLocation').addEventListener('click', function() {
+                    if (navigator.geolocation) {
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Getting location...';
+                        this.disabled = true;
+                        
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                console.log('Manual current location:', lat, lng);
+                                
+                                // Update map to current location
+                                map.setView([lat, lng], 16);
+                                
+                                // Add or update marker
+                                if (marker) {
+                                    map.removeLayer(marker);
+                                }
+                                marker = L.marker([lat, lng]).addTo(map);
+                                marker.bindPopup('Your current location').openPopup();
+                                
+                                // Get address for current location
+                                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const address = data.display_name;
+                                        marker.bindPopup(`Your current location: ${address}`).openPopup();
+                                        document.getElementById('location').value = address;
+                                        document.getElementById('latitude').value = lat;
+                                        document.getElementById('longitude').value = lng;
+                                    })
+                                    .catch(error => {
+                                        console.error('Error getting address:', error);
+                                        marker.bindPopup(`Your current location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`).openPopup();
+                                        document.getElementById('location').value = `Current location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                                        document.getElementById('latitude').value = lat;
+                                        document.getElementById('longitude').value = lng;
+                                    })
+                                    .finally(() => {
+                                        // Reset button
+                                        document.getElementById('useCurrentLocation').innerHTML = '<i class="fas fa-location-arrow me-1"></i>Use My Current Location';
+                                        document.getElementById('useCurrentLocation').disabled = false;
+                                    });
+                            },
+                            function(error) {
+                                console.log('Geolocation error:', error.message);
+                                alert('Unable to get your current location. Please try again or manually select a location.');
+                                // Reset button
+                                document.getElementById('useCurrentLocation').innerHTML = '<i class="fas fa-location-arrow me-1"></i>Use My Current Location';
+                                document.getElementById('useCurrentLocation').disabled = false;
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 10000,
+                                maximumAge: 300000 // 5 minutes
+                            }
+                        );
+                    } else {
+                        alert('Geolocation is not supported by your browser.');
+                    }
+                });
+                
+                // Handle map clicks
+                map.on('click', function(e) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    
+                    // Add or update marker
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker([lat, lng]).addTo(map);
+                    
+                    // Reverse geocode to get address
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const address = data.display_name;
+                            marker.bindPopup(address).openPopup();
+                            document.getElementById('location').value = address;
+                            document.getElementById('latitude').value = lat;
+                            document.getElementById('longitude').value = lng;
+                        })
+                        .catch(error => {
+                            console.error('Error reverse geocoding:', error);
+                            marker.bindPopup(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`).openPopup();
+                            document.getElementById('location').value = `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                            document.getElementById('latitude').value = lat;
+                            document.getElementById('longitude').value = lng;
+                        });
+                });
+                
+                // Handle location input changes
+                const locationInput = document.getElementById('location');
+                let searchTimeout;
+                
+                locationInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    const query = this.value.trim();
+                    
+                    if (query.length > 2) {
+                        searchTimeout = setTimeout(() => {
+                            console.log('Searching for:', query);
+                            // Search for location
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Search results:', data);
+                                    if (data.length > 0) {
+                                        const firstResult = data[0];
+                                        const lat = parseFloat(firstResult.lat);
+                                        const lng = parseFloat(firstResult.lon);
+                                        
+                                        console.log('Setting map to:', lat, lng);
+                                        // Update map view
+                                        map.setView([lat, lng], 16);
+                                        
+                                        // Add or update marker
+                                        if (marker) {
+                                            map.removeLayer(marker);
+                                        }
+                                        marker = L.marker([lat, lng]).addTo(map);
+                                        marker.bindPopup(firstResult.display_name).openPopup();
+                                        
+                                        // Update coordinates
+                                        document.getElementById('latitude').value = lat;
+                                        document.getElementById('longitude').value = lng;
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error searching location:', error);
+                                });
+                        }, 1000); // Wait 1 second after user stops typing
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:1.1rem;"><i class="fas fa-exclamation-triangle me-2"></i>Error loading map</div>';
             }
         });
     </script>
