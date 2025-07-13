@@ -80,3 +80,7 @@
 2025-07-06 21:57:02 - Failed login attempt - ::1 - Email: admin@example.com - Invalid password
 2025-07-06 22:05:00 - Successful login - ::1 - User ID: 5, Email: admin@example.com
 2025-07-06 22:05:27 - Successful login - ::1 - User ID: 5, Email: admin@example.com
+2025-07-07 00:32:45 - Successful login - ::1 - User ID: 5, Email: admin@example.com
+2025-07-07 22:06:11 - Successful login - ::1 - User ID: 5, Email: admin@example.com
+2025-07-09 10:48:59 - Successful login - ::1 - User ID: 5, Email: admin@example.com
+2025-07-09 10:50:47 - Successful login - ::1 - User ID: 5, Email: admin@example.com
